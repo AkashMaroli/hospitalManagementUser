@@ -1,7 +1,10 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:hospitalmanagementuser/data/models/user_patient_model.dart';
+import 'package:hospitalmanagementuser/data/services/patient_services.dart';
 
 final FirebaseAuth auth = FirebaseAuth.instance;
 final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -9,7 +12,10 @@ final GoogleSignIn _googleSignIn = GoogleSignIn();
 /// 🔐 Sign in with email & password
 Future<User?> signIn(String email, String password) async {
   try {
-    final result = await auth.signInWithEmailAndPassword(email: email, password: password);
+    final result = await auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
     return result.user;
   } catch (e) {
     print("Email sign-in failed: $e");
@@ -20,7 +26,14 @@ Future<User?> signIn(String email, String password) async {
 /// 🧾 Register a new user
 Future<User?> register(String email, String password) async {
   try {
-    final result = await auth.createUserWithEmailAndPassword(email: email, password: password);
+    final result = await auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    await FirebaseFirestore.instance.collection('users').add({
+      'userName': result.user?.uid,
+      'emilId': email 
+    });
     return result.user;
   } catch (e) {
     print("Error registering: $e");
@@ -31,9 +44,9 @@ Future<User?> register(String email, String password) async {
 /// 🔄 Reset user password via email
 Future<void> resetPassword(BuildContext context, String email) async {
   if (email.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please enter your email.")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Please enter your email.")));
     return;
   }
 
@@ -41,7 +54,9 @@ Future<void> resetPassword(BuildContext context, String email) async {
     await auth.sendPasswordResetEmail(email: email);
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Password reset email sent! Check your inbox.")),
+      const SnackBar(
+        content: Text("Password reset email sent! Check your inbox."),
+      ),
     );
   } catch (e) {
     print("Error: $e");
@@ -59,9 +74,9 @@ Future<void> resetPassword(BuildContext context, String email) async {
     }
 
     // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(errorMessage)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(errorMessage)));
   }
 }
 
@@ -78,6 +93,17 @@ Future<User?> signInWithGoogle() async {
     );
 
     final userCredential = await auth.signInWithCredential(credential);
+    // userAuthData = userCredential.user;
+    final user = await FirebaseAuth.instance.currentUser;
+    final userDetail = UserPatientModel(
+      fullName: userCredential.user?.displayName ?? userCredential.user?.uid,
+      emailId: userCredential.user?.email ?? 'unknown@gmail.com',
+      profilePhotoUrl: userCredential.user?.photoURL,
+      patientDetailsList: [],
+    );
+    createOrUpdateUser(user?.uid, userDetail);
+    
+
     return userCredential.user;
   } catch (e) {
     print("Google sign-in failed: $e");
@@ -88,13 +114,12 @@ Future<User?> signInWithGoogle() async {
 /// 🚪 Sign out from Firebase & Google
 Future<void> signOut() async {
   try {
-      await _googleSignIn.disconnect(); 
+    await _googleSignIn.disconnect();
     await _googleSignIn.signOut(); // Disconnect Google session
-    await auth.signOut();         // Firebase sign-out
+    await auth.signOut(); // Firebase sign-out
     print("User signed out successfully!");
     log('success');
   } catch (e) {
     print("Error signing out: $e");
   }
 }
-

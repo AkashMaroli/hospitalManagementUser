@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hospitalmanagementuser/data/services/razorpay_services.dart';
 
-
-Widget buildPayButton(BuildContext context) {
+Widget buildPayButton(BuildContext context, VoidCallback buttonFunction) {
   return ElevatedButton(
     onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PaymentPage()),
-      );
+      buttonFunction();
+      print('working button');
     },
     style: ElevatedButton.styleFrom(
       minimumSize: Size(double.infinity, 50),

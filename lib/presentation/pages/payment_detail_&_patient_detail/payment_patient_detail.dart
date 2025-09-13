@@ -1,12 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hospitalmanagementuser/core/constants.dart';
 import 'package:hospitalmanagementuser/data/models/doctors_model.dart';
+import 'package:hospitalmanagementuser/data/services/auth_services.dart';
+import 'package:hospitalmanagementuser/presentation/controllers/global_controller.dart';
 import 'package:hospitalmanagementuser/presentation/pages/doctor_detail/widget/patient_info_card_widget.dart';
 import 'package:hospitalmanagementuser/presentation/pages/payment_detail_&_patient_detail/widget/button_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 // ignore: must_be_immutable
-class PaymentPatientDetail extends StatelessWidget {
+class PaymentPatientDetail extends StatefulWidget {
   DoctorsProfileModel doctorsProfileModel;
   final DateTime date;
   final String time;
@@ -18,9 +24,26 @@ class PaymentPatientDetail extends StatelessWidget {
   });
 
   @override
+  State<PaymentPatientDetail> createState() => _PaymentPatientDetailState();
+}
+
+class _PaymentPatientDetailState extends State<PaymentPatientDetail> {
+  late Razorpay _razorpay;
+  String patientname='';
+  var amountTotal;
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final String formattedDate = DateFormat('dd MMM, yyyy').format(date);
-    int sum=doctorsProfileModel.expectedConsultationFee+50;
+    final String formattedDate = DateFormat('dd MMM, yyyy').format(widget.date);
+    int sumamount = widget.doctorsProfileModel.expectedConsultationFee + 50;
+    amountTotal=sumamount;
     return Scaffold(
       backgroundColor: backgroudColor,
       body: SingleChildScrollView(
@@ -37,15 +60,15 @@ class PaymentPatientDetail extends StatelessWidget {
                   height: 100,
                   color: const Color.fromARGB(255, 230, 239, 255),
                   child: Image.network(
-                    doctorsProfileModel.photoUrl,
+                    widget.doctorsProfileModel.photoUrl,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
               SizedBox(height: 10),
-              Text(doctorsProfileModel.fullName),
-              Text(doctorsProfileModel.department),
-              Text(doctorsProfileModel.qualification),
+              Text(widget.doctorsProfileModel.fullName),
+              Text(widget.doctorsProfileModel.department),
+              Text(widget.doctorsProfileModel.qualification),
               // Row(
               //   mainAxisAlignment: MainAxisAlignment.start,
               //   children: [Text(" Appointment")],
@@ -70,7 +93,7 @@ class PaymentPatientDetail extends StatelessWidget {
                         children: [
                           SizedBox(width: 10),
                           Icon(Icons.query_builder),
-                          Text(time),
+                          Text(widget.time),
                           SizedBox(width: 30),
                           Icon(Icons.calendar_month_outlined),
                           Text(formattedDate),
@@ -111,7 +134,7 @@ class PaymentPatientDetail extends StatelessWidget {
                           Column(
                             children: [
                               Text(
-                                '${doctorsProfileModel.expectedConsultationFee}',
+                                '${widget.doctorsProfileModel.expectedConsultationFee}',
                               ),
                             ],
                           ),
@@ -141,7 +164,7 @@ class PaymentPatientDetail extends StatelessWidget {
                           Column(
                             children: [
                               Text(
-                                '$sum',
+                                '$sumamount',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -186,11 +209,79 @@ class PaymentPatientDetail extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              buildPayButton(context),
+              buildPayButton(context, openCheckout),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void openCheckout() async {
+    var options = {
+      'key': myRazorpayapikey, // Replace with your Razorpay Key
+      'amount': amountTotal * 100, // in paise = 500 INR
+      'name': 'Med Valley',
+      'description': 'Payment for services',
+       'prefill': {'contact': '9876543210', 'email': 'example@domain.com'},
+      'external': {
+        'wallets': ['paytm'],
+      },
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    // String userId =
+    //     "USER_ID"; // Replace with real user ID from FirebaseAuth if using auth
+    String purpose = "Appointment Booking";
+    DateTime now = DateTime.now();
+
+    try {
+      await FirebaseFirestore.instance.collection('payments').add({
+        'userId': FirebaseAuth.instance.currentUser?.uid,
+        'paymentId': response.paymentId,
+        'amount': amountTotal / 100, // convert paise to INR
+        'purpose': purpose,
+        'timestamp': now,
+      });
+      await FirebaseFirestore.instance.collection('appointments').add({
+        'userId': FirebaseAuth.instance.currentUser?.uid,
+        'doctorId':widget.doctorsProfileModel.id ,
+        'patientName': patientname, 
+        'date': widget.date,
+        'time': widget.time,
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Payment Successful!")));
+    } catch (e) {
+      print("Error saving payment: $e");
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Payment saved failed")));
+    }
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    print("Payment Error: ${response.message}");
+    // Show error message
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    print("External Wallet Selected: ${response.walletName}");
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
   }
 }

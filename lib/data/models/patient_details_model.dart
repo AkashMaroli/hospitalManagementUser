@@ -1,6 +1,7 @@
 import 'package:hospitalmanagementuser/data/models/patient_history_model.dart';
 
 class PatientDetailModel {
+  final String patientId; 
   final String patientFullName;
   final String age;
   final String mobNumber;
@@ -10,6 +11,8 @@ class PatientDetailModel {
   final List<PatientHistoryModel>? patientHistory;
 
   PatientDetailModel({
+        required this.patientId,
+
     required this.patientFullName,
     required this.age,
     required this.mobNumber,
@@ -21,6 +24,8 @@ class PatientDetailModel {
 
   factory PatientDetailModel.fromJson(Map<String, dynamic> json) {
     return PatientDetailModel(
+            patientId: json['patientId'], // NEW
+
       patientFullName: json['patientFullName'],
       age: json['age'],
       mobNumber: json['mobNumber'],
@@ -37,6 +42,8 @@ class PatientDetailModel {
 
   Map<String, dynamic> toJson() {
     return {
+            'patientId': patientId, // NEW
+
       'patientFullName': patientFullName,
       'age': age,
       'mobNumber': mobNumber,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:super_icons/super_icons.dart';
 
 class SplashScreen extends StatefulWidget {
   final Widget nextScreen;
@@ -78,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
             // Animated logo with bounce
             ScaleTransition(
               scale: _logoScale,
-              child: const Icon(Icons.local_hospital_rounded,
+              child: const Icon(SuperIcons.lc_stethoscope,
                   size: 75, color: Colors.white),
             ),
 

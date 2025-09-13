@@ -77,7 +77,7 @@ class AllDoctorsScreen extends StatelessWidget {
   // Doctor Grid Item Widget
   Widget doctorGridItem(DoctorsProfileModel obj, BuildContext context) {
     return GestureDetector(
-      onDoubleTap: () {
+      onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -152,7 +152,7 @@ class AllDoctorsScreen extends StatelessWidget {
                   Icon(Icons.star, color: Colors.amber, size: 14),
                   SizedBox(width: 3),
                   Text(
-                    '4.0', // Assuming a default rating
+                    '4.2', // Assuming a default rating
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(width: 3),
