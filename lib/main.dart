@@ -11,9 +11,9 @@ import 'package:hospitalmanagementuser/presentation/pages/splash_screen/splash_s
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // var userDeaill = await userDataFetching();
-  // log(userDetaill.toString());
   runApp(const MyApp());
+  // final userDet = await userDataFetching();
+  // userDetailsCarrier = userDet;
 }
 
 class MyApp extends StatelessWidget {

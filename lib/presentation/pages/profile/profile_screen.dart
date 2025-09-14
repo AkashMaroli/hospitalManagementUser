@@ -19,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
           if (!snapshot.hasData) {
             return const Center(child: Text("⚠️ No user data found"));
           }
-
+          // userDetailsCarrier = snapshot.data!;
           final userDetail = snapshot.data!;
           return Center(
             child: Column(
@@ -40,7 +40,10 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: Image.asset('assets/images/old-man-20.png'),
+                    child:
+                        userDetail.profilePhotoUrl!.isEmpty
+                            ? Image.asset('assets/images/old-man-20.png')
+                            : Image.network(userDetail.profilePhotoUrl ?? ''),
                   ),
                   title: Text(userDetail.fullName ?? "No Name"),
                   trailing: const SizedBox(
@@ -50,17 +53,25 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 60),
                 const ListTile(
-                    leading: Icon(Icons.settings), title: Text('Settings')),
+                  leading: Icon(Icons.settings),
+                  title: Text('Settings'),
+                ),
                 const ListTile(
-                    leading: Icon(Icons.notifications),
-                    title: Text('Notification')),
+                  leading: Icon(Icons.notifications),
+                  title: Text('Notification'),
+                ),
                 const ListTile(
-                    leading: Icon(Icons.history_edu_rounded),
-                    title: Text('Transaction history')),
+                  leading: Icon(Icons.history_edu_rounded),
+                  title: Text('Transaction history'),
+                ),
                 const ListTile(
-                    leading: Icon(Icons.quiz_outlined), title: Text('FAQ')),
+                  leading: Icon(Icons.quiz_outlined),
+                  title: Text('FAQ'),
+                ),
                 const ListTile(
-                    leading: Icon(Icons.info), title: Text('About App')),
+                  leading: Icon(Icons.info),
+                  title: Text('About App'),
+                ),
                 LogoutWidget(),
               ],
             ),

@@ -4,7 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hospitalmanagementuser/core/constants.dart';
 import 'package:hospitalmanagementuser/data/models/doctors_model.dart';
+import 'package:hospitalmanagementuser/data/models/user_patient_model.dart';
 import 'package:hospitalmanagementuser/data/services/auth_services.dart';
+import 'package:hospitalmanagementuser/data/services/patient_services.dart';
 import 'package:hospitalmanagementuser/presentation/controllers/global_controller.dart';
 import 'package:hospitalmanagementuser/presentation/pages/doctor_detail/widget/patient_info_card_widget.dart';
 import 'package:hospitalmanagementuser/presentation/pages/payment_detail_&_patient_detail/widget/button_widget.dart';
@@ -28,8 +30,10 @@ class PaymentPatientDetail extends StatefulWidget {
 }
 
 class _PaymentPatientDetailState extends State<PaymentPatientDetail> {
+  late Future<UserPatientModel> userDetailsCarrier;
+
   late Razorpay _razorpay;
-  String patientname='';
+  String patientname = '';
   var amountTotal;
   void initState() {
     super.initState();
@@ -37,13 +41,14 @@ class _PaymentPatientDetailState extends State<PaymentPatientDetail> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    userDetailsCarrier = userDataFetching();
   }
 
   @override
   Widget build(BuildContext context) {
     final String formattedDate = DateFormat('dd MMM, yyyy').format(widget.date);
     int sumamount = widget.doctorsProfileModel.expectedConsultationFee + 50;
-    amountTotal=sumamount;
+    amountTotal = sumamount;
     return Scaffold(
       backgroundColor: backgroudColor,
       body: SingleChildScrollView(
@@ -73,7 +78,27 @@ class _PaymentPatientDetailState extends State<PaymentPatientDetail> {
               //   mainAxisAlignment: MainAxisAlignment.start,
               //   children: [Text(" Appointment")],
               // ),
-              PatientInfoCard(),
+              FutureBuilder<UserPatientModel>(
+                future: userDetailsCarrier,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // show loader while waiting
+                  } else if (snapshot.hasError) {
+                    return Text("Error: ${snapshot.error}");
+                  } else if (!snapshot.hasData) {
+                    return Text("No user data found");
+                  } else {
+                    final user = snapshot.data!;
+                    print("${user.patientDetailsList?.length}");
+                    return PatientInfoCard(
+                      obj: user,
+                      isFirstPatient:
+                          (user.patientDetailsList!.isEmpty) ? true : false,
+                    );
+                  }
+                },
+              ),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [Text("Schedule")],
@@ -223,7 +248,7 @@ class _PaymentPatientDetailState extends State<PaymentPatientDetail> {
       'amount': amountTotal * 100, // in paise = 500 INR
       'name': 'Med Valley',
       'description': 'Payment for services',
-       'prefill': {'contact': '9876543210', 'email': 'example@domain.com'},
+      'prefill': {'contact': '9876543210', 'email': 'example@domain.com'},
       'external': {
         'wallets': ['paytm'],
       },
@@ -252,8 +277,8 @@ class _PaymentPatientDetailState extends State<PaymentPatientDetail> {
       });
       await FirebaseFirestore.instance.collection('appointments').add({
         'userId': FirebaseAuth.instance.currentUser?.uid,
-        'doctorId':widget.doctorsProfileModel.id ,
-        'patientName': patientname, 
+        'doctorId': widget.doctorsProfileModel.id,
+        'patientName': patientname,
         'date': widget.date,
         'time': widget.time,
       });

@@ -4,32 +4,28 @@ import 'package:flutter/material.dart';
 class ButtonWidget extends StatelessWidget {
   String buttonTitle;
   VoidCallback buttonOnpress;
-  ButtonWidget({super.key, required this.buttonTitle,required this.buttonOnpress});
+  ButtonWidget({
+    super.key,
+    required this.buttonTitle,
+    required this.buttonOnpress,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20,right: 20),
+      padding: const EdgeInsets.only(left: 20, right: 20),
       child: ElevatedButton(
-        onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => BottomNavBar(),
-          //   ),
-          // );
-        },
+        onPressed: () => buttonOnpress(),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.black,
-          // fixedSize: Size(double.infinity, 20),
-          minimumSize: Size(double.infinity, 50),
+          minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         ),
         child: Text(
           buttonTitle,
           style: TextStyle(
             fontSize: 18,
-            color: const Color.fromARGB(255, 255, 255, 255),
+            color: Colors.white,
             fontWeight: FontWeight.w500,
           ),
         ),

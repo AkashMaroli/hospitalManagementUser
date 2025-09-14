@@ -10,7 +10,6 @@ import 'package:hospitalmanagementuser/data/models/patient_details_model.dart';
 import 'package:hospitalmanagementuser/data/models/patient_history_model.dart';
 import 'package:hospitalmanagementuser/data/models/user_patient_model.dart';
 
-var userDetaill;
 Future<UserPatientModel> userDataFetching() async {
   final currentUser = FirebaseAuth.instance.currentUser;
   print(currentUser?.photoURL);
@@ -51,7 +50,7 @@ Future<void> addPatient(String uid, PatientDetailModel patient) async {
   });
 
   // Create a patients sub-collection doc for history
-  await userDoc.collection('patients').doc(patient.patientId).set({
+  await userDoc.collection('patientDetailsList').doc(patient.patientId).set({
     'basicInfo': patient.toJson(),
   });
 }

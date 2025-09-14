@@ -7,12 +7,13 @@ import 'package:hospitalmanagementuser/data/models/doctors_model.dart';
 import 'package:hospitalmanagementuser/presentation/bloc/bloc_doctors/doctors_section_bloc.dart';
 import 'package:hospitalmanagementuser/presentation/bloc/bloc_doctors/doctors_section_event.dart';
 import 'package:hospitalmanagementuser/presentation/bloc/bloc_doctors/doctors_section_state.dart';
+import 'package:hospitalmanagementuser/presentation/pages/docors_section/search_doctors_helper.dart';
 import 'package:hospitalmanagementuser/presentation/pages/doctor_detail/doctor_detail.dart';
 
 // ignore: must_be_immutable
 class AllDoctorsScreen extends StatelessWidget {
   FlipCardController con1 = FlipCardController();
-   AllDoctorsScreen({super.key});
+  AllDoctorsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,17 @@ class AllDoctorsScreen extends StatelessWidget {
               Text('Find and consult doctors?', style: TextStyle(fontSize: 14)),
             ],
           ),
-          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
+          actions: [
+            IconButton(
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: DoctorSearchDelegate(context.read<DoctorBloc>()),
+                );
+              },
+              icon: Icon(Icons.search),
+            ),
+          ],
         ),
         body: BlocBuilder<DoctorBloc, DoctorState>(
           builder: (context, state) {
