@@ -48,7 +48,7 @@ Future<List<String>> fetchBookedSlots(String? doctorId, DateTime date) async {
 
   final snapshot = await FirebaseFirestore.instance
       .collection('appointments')
-      .where('doctor_id', isEqualTo: doctorId)
+      .where('doctorId', isEqualTo: doctorId)
       .where('date', isEqualTo: formattedDate)
       .get();
 

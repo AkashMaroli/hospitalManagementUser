@@ -1,40 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessageModel {
-  final String id;
+  final String? chatId;
   final String senderId;
   final String receiverId;
-  final String content;
+  final String message;
   final DateTime timestamp;
-  final bool isRead;
+  final bool seen;
 
   ChatMessageModel({
-    required this.id,
+    this.chatId,
     required this.senderId,
     required this.receiverId,
-    required this.content,
+    required this.message,
     required this.timestamp,
-    required this.isRead,
+    this.seen = false,
   });
 
-  factory ChatMessageModel.fromJson(Map<String, dynamic> json, String docId) {
-    return ChatMessageModel(
-      id: docId,
-      senderId: json['sender_id'] ?? '',
-      receiverId: json['receiver_id'] ?? '',
-      content: json['content'] ?? '',
-      timestamp: (json['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isRead: json['is_read'] ?? false,
-    );
+  Map<String, dynamic> toMap() {
+    return {
+      "senderId": senderId,
+      "receiverId": receiverId,
+      "message": message,
+      "timestamp": timestamp.millisecondsSinceEpoch,
+      "seen": seen,
+    };
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'sender_id': senderId,
-      'receiver_id': receiverId,
-      'content': content,
-      'timestamp': timestamp,
-      'is_read': isRead,
-    };
+  factory ChatMessageModel.fromMap(DocumentSnapshot doc) {
+    final map = doc.data() as Map<String, dynamic>;
+    return ChatMessageModel(
+      chatId: doc.id,
+      senderId: map['senderId'],
+      receiverId: map['receiverId'],
+      message: map['message'],
+      timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp']),
+      seen: map['seen'] ?? false,
+    );
   }
 }

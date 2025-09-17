@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hospitalmanagementuser/data/services/patient_services.dart';
 import 'package:hospitalmanagementuser/main_state_check.dart';
 import 'package:hospitalmanagementuser/presentation/bloc/bloc_doctors/doctors_section_bloc.dart';
 import 'package:hospitalmanagementuser/presentation/pages/splash_screen/splash_screen.dart'; // Import your Bloc
@@ -12,8 +11,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
-  // final userDet = await userDataFetching();
-  // userDetailsCarrier = userDet;
+  
 }
 
 class MyApp extends StatelessWidget {

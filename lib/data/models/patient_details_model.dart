@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hospitalmanagementuser/data/models/patient_history_model.dart';
 
 class PatientDetailModel {
-  final String? patientId; 
+  final String? patientId;
   final String patientFullName;
   final String age;
   final String mobNumber;
@@ -21,30 +22,33 @@ class PatientDetailModel {
     this.patientHistory,
   });
 
-  factory PatientDetailModel.fromJson(Map<String, dynamic> json) {
+  factory PatientDetailModel.fromJson(DocumentSnapshot doc) {
+    // here i made a change i changed the parameter map<string,dynamic> json to current format
+    // in the future is there any issue do the nesassery steps
+    final json = doc.data() as Map<String, dynamic>;
 
-    
     return PatientDetailModel(
-            patientId: json['patientId'], // NEW
+      patientId: doc.id, // NEW// patent id(json['patienId']) change to doc.id//!
 
       patientFullName: json['patientFullName'],
       age: json['age'],
       mobNumber: json['mobNumber'],
       gender: json['gender'],
       department: json['department'],
-      documentUrl: (json['documentUrl'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList(),
-      patientHistory: (json['patientHistory'] as List<dynamic>?)
-          ?.map((e) => PatientHistoryModel.fromJson(e))
-          .toList(),
+      documentUrl:
+          (json['documentUrl'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList(),
+      patientHistory:
+          (json['patientHistory'] as List<dynamic>?)
+              ?.map((e) => PatientHistoryModel.fromJson(e))
+              .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-            'patientId': patientId, // NEW
-
+          // patien id part removed //!
       'patientFullName': patientFullName,
       'age': age,
       'mobNumber': mobNumber,

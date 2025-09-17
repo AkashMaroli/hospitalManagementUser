@@ -60,6 +60,9 @@ Future<void> addPatientHistory({
   required String patientId,
   required PatientHistoryModel history,
 }) async {
+
+  // here few mistakes will come because here second collection patients is not exist in firebase it a list in firebase
+  
   final historyRef = FirebaseFirestore.instance
       .collection('users')
       .doc(uid)
