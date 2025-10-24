@@ -73,5 +73,4 @@ This app is the **user-side module** of the hospital management ecosystem and wo
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/hospital-user-app.git
-cd hospital-user-app
+git clone https://github.com/AkashMaroli/hospitalManagementUser#1-clone-the-repository
