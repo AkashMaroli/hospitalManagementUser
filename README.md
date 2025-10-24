@@ -1,16 +1,77 @@
-# hospitalmanagementuser
+# 👨‍⚕️ Hospital Management App – User Side
 
-A new Flutter project.
+> **A patient-friendly mobile app built with Flutter & Firebase for booking doctor appointments, managing profiles, and uploading health documents.**
 
-## Getting Started
+![Flutter](https://img.shields.io/badge/Flutter-Mobile-blue?logo=flutter)
+![Firebase](https://img.shields.io/badge/Firebase-Backend-yellow?logo=firebase)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-Storage-orange?logo=cloudinary)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Overview
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+The **Hospital Management User App** is a cross-platform mobile application developed using **Flutter** and **Firebase**.  
+It allows patients to browse doctors, book appointments, upload medical documents, and track their appointments in real-time.  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This app is the **user-side module** of the hospital management ecosystem and works seamlessly with the **Admin Panel** and **Doctor App**.
+
+---
+
+## 📋 Table of Contents
+
+- [🚀 Features](#-features)
+- [👤 User Authentication](#-user-authentication)
+- [🛠️ Tech Stack](#-tech-stack)
+- [⚙️ Installation](#️-installation)
+- [📦 Configuration](#-configuration)
+- [💻 Usage](#-usage)
+- [📷 Screenshots](#-screenshots)
+- [🧩 Troubleshooting](#-troubleshooting)
+- [🙋 Contributors](#-contributors)
+- [📝 License](#-license)
+
+---
+
+## 🚀 Features
+
+✅ User registration and login via **Firebase Auth**  
+✅ Browse verified doctors with detailed profiles  
+✅ Search and filter doctors by specialization or name  
+✅ Book, view, and cancel appointments  
+✅ Upload health documents (PDF/images) via **Cloudinary**  
+✅ Responsive and modern UI using **Material 3**  
+✅ Real-time updates on appointment status  
+✅ Notifications for appointment confirmations (if implemented)  
+
+---
+
+## 👤 User Authentication
+
+> Easy, secure, and privacy-first.
+
+- Authentication is handled using **Firebase Authentication** (Email / Google Sign-In).  
+- Each user has a unique account linked to their **appointments and documents**.  
+- Users can update their **profile information** and view **appointment history**.  
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer        | Technology                  |
+|--------------|-----------------------------|
+| Frontend     | Flutter (Dart)              |
+| State Mgmt   |  Bloc                       |
+| Backend/Auth | Firebase Authentication     |
+| Database     | Firebase Firestore          |
+| File Storage | Cloudinary                  |
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/hospital-user-app.git
+cd hospital-user-app
