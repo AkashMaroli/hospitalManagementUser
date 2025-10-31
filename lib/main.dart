@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,22 +12,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
-  
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
+    log('${FirebaseAuth.instance.currentUser?.email??'bahubali'}');
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => DoctorBloc()), // Provide DoctorBloc
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'MedValley',
         theme: ThemeData(
+           scaffoldBackgroundColor: Colors.white, 
+           appBarTheme:AppBarTheme(backgroundColor: Colors.white),
           //  colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           // **Text Theme**
           textTheme: const TextTheme(
@@ -41,22 +44,24 @@ class MyApp extends StatelessWidget {
               color: Color.fromARGB(255, 0, 0, 0),
             ),
           ),
-
+            cardColor: Colors.white,
+            canvasColor: Colors.white,
           // **Button Theme**
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple, // Button color
+              // backgroundColor: Colors.deepPurple, // Button color
               foregroundColor: Colors.white, // Text color
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              
             ),
           ),
         ),
         home: SplashScreen(
           nextScreen: AuthStateListener(),
-        ), // Your authentication state handler
+        ), 
       ),
     );
   }

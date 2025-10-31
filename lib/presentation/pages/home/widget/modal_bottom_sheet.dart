@@ -1,7 +1,7 @@
 
   import 'package:flutter/material.dart';
 import 'package:hospitalmanagementuser/presentation/pages/appointments/appoinment_screen.dart';
-import 'package:hospitalmanagementuser/presentation/pages/chat/chat_screen.dart';
+import 'package:hospitalmanagementuser/presentation/pages/chat/chating/chating_screen.dart';
 import 'package:hospitalmanagementuser/presentation/pages/docors_section/all_doctors_screen.dart';
 import 'package:hospitalmanagementuser/presentation/pages/home/widget/item_widget.dart';
 
@@ -133,13 +133,13 @@ void largeBottomSheet(BuildContext context) {
                         'ENT',
                         Icons.hearing_rounded,
                         () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => ChatScreen(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder:
+                          //         (context) => ChatScreen(),
+                          //   ),
+                          // );
                         },
                       ),
                       itemsWidget('Dental', Icons.stop, () {

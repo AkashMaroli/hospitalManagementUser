@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hospitalmanagementuser/data/services/auth_services.dart';
 import 'package:hospitalmanagementuser/presentation/auth/sign_up_screen.dart';
 import 'package:hospitalmanagementuser/presentation/auth/widget/modelsheet_password_reset.dart';
+import 'package:hospitalmanagementuser/presentation/pages/profile/privacy_policy.dart';
+import 'package:hospitalmanagementuser/presentation/pages/profile/terms_and_conditions.dart';
 import 'package:hospitalmanagementuser/presentation/widgets/bottom_nav_bar.dart';
 import 'package:hospitalmanagementuser/presentation/widgets/login_widgets.dart';
 
@@ -32,10 +34,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF20B2AA),
-                      Color(0xFF008B8B),
-                    ],
+                    colors: [Color(0xFF20B2AA), Color(0xFF008B8B)],
                   ),
                 ),
                 height: 700,
@@ -45,7 +44,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Form(
                     key: _formkey,
                     child: Column(
-                      spacing: 15, // You used spacing here in original, leaving it untouched
+                      spacing:
+                          10, // You used spacing here in original, leaving it untouched
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
@@ -84,8 +84,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
-                            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(value)) {
+                            } else if (!RegExp(
+                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                            ).hasMatch(value)) {
                               return 'Please enter a valid email';
                             }
                             return null;
@@ -103,7 +104,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ],
                         ),
-                        passwordTextField('Enter', true, passwordController, (value) {
+                        passwordTextField('Enter',  passwordController, (
+                          value,
+                        ) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
                           } else if (value.length < 6) {
@@ -160,7 +163,9 @@ class _SignInScreenState extends State<SignInScreen> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpScreen(),
+                                  ),
                                 );
                               },
                               child: const Text(
@@ -203,6 +208,47 @@ class _SignInScreenState extends State<SignInScreen> {
                             ],
                           ),
                         ),
+                        Text('By registering you agree to'),
+                    // SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 5,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => TermsAndConditionsPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Terms & Conditions',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text('and', style: TextStyle(color: Colors.black)),
+                        GestureDetector(
+                           onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PrivacyPolicyPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Privacy Policy',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                       ],
                     ),
                   ),
@@ -230,14 +276,13 @@ class _SignInScreenState extends State<SignInScreen> {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
-      final user = await signIn(email, password);
+      final user = await signIn(email, password, context);
       setState(() => isLoading = false);
 
       if (user != null) {
-        Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(builder: (context) => BottomNavBar()),
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const BottomNavBar()),
+          (route) => false, // This removes all previous routes
         );
       } else {
         // ignore: use_build_context_synchronously
@@ -250,20 +295,19 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _handleGoogleSignIn() async {
     setState(() => isLoading = true);
-    final user = await signInWithGoogle();
+    final user = await signInWithGoogle(context);
     setState(() => isLoading = false);
 
     if (user != null) {
-      Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(builder: (context) => BottomNavBar()),
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const BottomNavBar()),
+        (route) => false, // This removes all previous routes
       );
     } else {
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Google sign-in failed")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Google sign-in failed")));
     }
   }
 }

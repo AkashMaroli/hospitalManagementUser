@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 class ReviewModel {
   final String reviewerName;
   final String reviewContent;
@@ -10,10 +12,14 @@ class ReviewModel {
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
+    log(json['rating']);
     return ReviewModel(
       reviewerName: json['reviewerName'] ?? '',
-      reviewContent: json['reviewContent'] ?? '',
-      rating: json['rating'] ?? 0,
+      reviewContent: json['review'] ?? '',
+      rating:
+          (json['rating'] is double)
+              ? (json['rating'] as double).round()
+              : (json['rating'] ?? 0),
     );
   }
 

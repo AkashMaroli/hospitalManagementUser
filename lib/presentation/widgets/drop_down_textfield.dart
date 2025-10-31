@@ -6,7 +6,7 @@ class PopupSelectField extends StatelessWidget {
   final IconData icon;
   final List<dynamic> options;
   final void Function(dynamic) onSelected;
-  final String? Function(String?)? validator;
+final FormFieldValidator<dynamic>? validator;
 
   const PopupSelectField({
     super.key,
@@ -20,49 +20,33 @@ class PopupSelectField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: TextEditingController(text: value?.toString()),
+    return DropdownButtonFormField<dynamic>(
+      value: value,
+      dropdownColor: Colors.white,
+      style: const TextStyle(fontSize: 16, color: Colors.black),
       decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon,color: Colors.grey,),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        filled: true,
-        fillColor: const Color.fromARGB(255, 242, 244, 248),
-        suffixIcon: const Icon(Icons.arrow_drop_down),
+    labelText: label,
+    prefixIcon: Icon(icon, color: Colors.grey),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    filled: true,
+    fillColor: const Color(0xFFF2F4F8),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
-      readOnly: true,
+      icon: const Icon(Icons.arrow_drop_down),
       validator: validator,
-      onTap: () => _showOptionsDialog(context),
-    );
-  }
-
-  void _showOptionsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          insetPadding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 300),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: options.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(options[index].toString()), // convert to string
-                  ),
-                  onTap: () {
-                    onSelected(options[index]); // keep original type
-                    Navigator.pop(context);
-                  },
-                );
-              },
+      // underline: const SizedBox(),
+      items: options
+      .map((option) => DropdownMenuItem(
+            value: option,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(option.toString(),
+                  style: const TextStyle(fontSize: 16)),
             ),
-          ),
-        );
-      },
+          ))
+      .toList(),
+      onChanged: onSelected,
     );
+
   }
 }

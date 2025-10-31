@@ -3,7 +3,7 @@ import 'package:hospitalmanagementuser/core/constants.dart';
 import 'package:hospitalmanagementuser/data/models/doctors_model.dart';
 import 'package:hospitalmanagementuser/data/services/doctors_service.dart';
 import 'package:hospitalmanagementuser/presentation/pages/payment_detail_&_patient_detail/payment_patient_detail.dart';
-import 'package:intl/intl.dart'; // Added for DateFormat
+import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class MaterialDoctorAppointmentPage extends StatefulWidget {
@@ -11,7 +11,6 @@ class MaterialDoctorAppointmentPage extends StatefulWidget {
   MaterialDoctorAppointmentPage({super.key, required this.profilObj});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MaterialDoctorAppointmentPageState createState() =>
       _MaterialDoctorAppointmentPageState();
 }
@@ -24,7 +23,6 @@ class _MaterialDoctorAppointmentPageState
   List<String> _availableSlots = [];
   List<String> _bookedSlots = [];
 
- 
   @override
   void initState() {
     super.initState();
@@ -35,13 +33,13 @@ class _MaterialDoctorAppointmentPageState
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top:  16.0,bottom: 16,left: 8,right: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
-        children: [          
+        children: [
           _buildCalendar(),
-          SizedBox(height: 20),
+          const SizedBox(height: 16),
           _buildTimeSlots(),
-          SizedBox(height: 20),
+          const SizedBox(height: 24),
           _buildBookButton(),
         ],
       ),
@@ -50,55 +48,60 @@ class _MaterialDoctorAppointmentPageState
 
   Widget _buildCalendar() {
     return Card(
-      color: backgroudColor,
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          datePickerTheme: DatePickerThemeData(
-            dayBackgroundColor: WidgetStateProperty.resolveWith<Color?>((
-              Set<WidgetState> states,
-            ) {
-              if (states.contains(WidgetState.selected)) {
-                return const Color(0xFF008B8B); // Selected date color
-              }
-              if (states.contains(WidgetState.disabled)) {
-                return Colors.grey[200]; // Disabled dates color
-              }
-              return null; // Default color
-            }),
-            dayForegroundColor: WidgetStateProperty.resolveWith<Color?>((
-              Set<WidgetState> states,
-            ) {
-              if (states.contains(WidgetState.selected)) {
-                return Colors.white; // Selected date text color
-              }
-              return null; // Default text color
-            }),
-            todayBorder: const BorderSide(
-              color: Colors.transparent,
-            ), // Remove today's border
-            todayForegroundColor: WidgetStateProperty.resolveWith<Color?>((
-              Set<WidgetState> states,
-            ) {
-              if (states.contains(WidgetState.selected)) {
-                return Colors.white; // Today's text color when selected
-              }
-              return const Color(
-                0xFF008B8B,
-              ); // Today's text color when not selected
-            }),
+      elevation: 3,
+      shadowColor: Colors.black26,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            datePickerTheme: DatePickerThemeData(
+              headerBackgroundColor: Colors.transparent,
+              headerForegroundColor: Colors.black87,
+              dayBackgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return const Color(0xFF008B8B);
+                  }
+                  if (states.contains(WidgetState.disabled)) {
+                    return Colors.grey[200];
+                  }
+                  return null;
+                },
+              ),
+              dayForegroundColor: WidgetStateProperty.resolveWith<Color?>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Colors.white;
+                  }
+                  if (states.contains(WidgetState.disabled)) {
+                    return Colors.grey[400];
+                  }
+                  return Colors.black87;
+                },
+              ),
+              todayBackgroundColor: WidgetStateProperty.all(Colors.transparent),
+              todayForegroundColor:
+                  WidgetStateProperty.all(const Color(0xFF008B8B)),
+              todayBorder: BorderSide.none,
+              dayStyle:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              yearStyle:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
-        ),
-        child: CalendarDatePicker(
-          initialDate: _selectedDate,
-          firstDate: DateTime.now(),
-          lastDate: DateTime.now().add(const Duration(days: 30)),
-          onDateChanged: (date) {
-            setState(() {
-              _selectedDate = date;
-              print(_selectedDate);
-            });
-            _loadAvailableSlots();
-          },
+          child: CalendarDatePicker(
+            initialDate: _selectedDate,
+            firstDate: DateTime.now(),
+            lastDate: DateTime.now().add(const Duration(days: 7)),
+            onDateChanged: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
+              _loadAvailableSlots();
+            },
+          ),
         ),
       ),
     );
@@ -106,49 +109,121 @@ class _MaterialDoctorAppointmentPageState
 
   Widget _buildTimeSlots() {
     return Card(
-      color: backgroudColor,
+      elevation: 3,
+      shadowColor: Colors.black26,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.only(top:  16.0,bottom: 16,left: 5,right: 5),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Select Time Slot',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Row(
+              children: const [
+                Icon(
+                  Icons.access_time_rounded,
+                  color: Color(0xFF008B8B),
+                  size: 22,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Select Time Slot',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 4),
+            Text(
+              DateFormat('EEEE, MMMM d, y').format(_selectedDate),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 16),
             _availableSlots.isEmpty
                 ? Center(
-                  child: Text(
-                    "No slots available for this day",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                )
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.event_busy_rounded,
+                            color: Colors.grey.shade400,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "No slots available for this day",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 : Wrap(
-                  spacing: 5,
-                  runSpacing: 5,
-                  children:
-                      _availableSlots.map((slot) {
-                        final isBooked = _bookedSlots.contains(slot);
+                    spacing: 2,
+                    runSpacing: 8,
+                    children: _availableSlots.map((slot) {
+                      final isBooked = _bookedSlots.contains(slot);
+                      final isSelected = _selectedTimeSlot == slot;
 
-                        return ChoiceChip(
-                          label: Text(slot),
-                          selected: _selectedTimeSlot == slot,
-                          selectedColor: Color(0xFF008B8B),
-                          backgroundColor:
-                              isBooked ? Colors.grey.shade300 : backgroudColor,
-                          onSelected:
-                              isBooked
-                                  ? null
-                                  : (selected) {
-                                    setState(() {
-                                      _selectedTimeSlot =
-                                          selected ? slot : null;
-                                    });
-                                  },
-                        );
-                      }).toList(),
-                ),
+                      return InkWell(
+                        onTap: isBooked
+                            ? null
+                            : () {
+                                setState(() {
+                                  _selectedTimeSlot =
+                                      isSelected ? null : slot;
+                                });
+                              },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isBooked
+                                ? Colors.grey.shade200
+                                : isSelected
+                                    ? const Color(0xFF008B8B)
+                                    : backgroudColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isBooked
+                                  ? Colors.grey.shade300
+                                  : isSelected
+                                      ? const Color(0xFF008B8B)
+                                      : Colors.grey.shade300,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Text(
+                            slot,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isBooked
+                                  ? Colors.grey.shade500
+                                  : isSelected
+                                      ? Colors.white
+                                      : Colors.black87,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
           ],
         ),
       ),
@@ -156,28 +231,59 @@ class _MaterialDoctorAppointmentPageState
   }
 
   Widget _buildBookButton() {
-    return ElevatedButton(
-      onPressed:
-          _selectedTimeSlot != null
-              ? () {
+    final isEnabled = _selectedTimeSlot != null;
+
+    return Container(
+      width: double.infinity,
+      height: 54,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF008B8B).withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [],
+      ),
+      child: ElevatedButton(
+        onPressed: isEnabled
+            ? () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (context) => PaymentPatientDetail(
-                          date: _selectedDate,
-                          time: _selectedTimeSlot!,
-                          doctorsProfileModel: profModel,
-                        ),
+                    builder: (context) => PaymentPatientDetail(
+                      date: _selectedDate,
+                      time: _selectedTimeSlot!,
+                      doctorsProfileModel: profModel,
+                    ),
                   ),
-                );
+                ).then((_) {
+                  // 👇 Auto refresh after returning from booking screen
+                  _loadAvailableSlots();
+                });
               }
-              : null,
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 50),
-        backgroundColor: Color(0xFF008B8B), // Dark Cyan
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF008B8B),
+          disabledBackgroundColor: Colors.grey.shade300,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          'Book Appointment',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isEnabled ? Colors.white : Colors.grey.shade500,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
-      child: Text('Book Appointment'),
     );
   }
 
@@ -187,68 +293,46 @@ class _MaterialDoctorAppointmentPageState
     String _formatTimeOfDay(TimeOfDay time) =>
         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
-    // Check if selected day is a working day for this doctor
-    final String selectedDayName = DateFormat(
-      'EEE',
-    ).format(_selectedDate); // e.g., Monday
+    // Get selected day name (e.g., Mon, Tue...)
+    final String selectedDayName = DateFormat('EEE').format(_selectedDate);
     if (!prof.availableDays.contains(selectedDayName)) {
       setState(() {
         _bookedSlots = [];
         _availableSlots = [];
         _selectedTimeSlot = null;
       });
-      // print("❌ Doctor not available on $selectedDayName");
       return;
     }
 
-    // ✅ Convert timeDurationNeeded into minutes safely
-    int durationMinutes = 0;
-    if (prof.timeDurationNeeded is Duration) {
-      durationMinutes = (prof.timeDurationNeeded as Duration).inMinutes;
-    } else if (prof.timeDurationNeeded is int) {
-      durationMinutes = prof.timeDurationNeeded as int;
-    } else if (prof.timeDurationNeeded is String) {
-      durationMinutes = int.tryParse(prof.timeDurationNeeded as String) ?? 0;
-    } else {
-      // print("⚠️ Unknown type for timeDurationNeeded: ${prof.timeDurationNeeded.runtimeType}");
-    }
-
+    // Slot duration
+    int durationMinutes = prof.timeDurationNeeded.inMinutes;
     if (durationMinutes <= 0) {
       setState(() {
         _bookedSlots = [];
         _availableSlots = [];
         _selectedTimeSlot = null;
       });
-      // print("❌ Invalid duration: ${prof.timeDurationNeeded}");
       return;
     }
 
-    // // Debug prints
-    // print("Doctor availability: ${prof.availableTimeStart} - ${prof.availableTimeEnd}");
-    // print("Duration (minutes): $durationMinutes");
-    // print("Selected date: $_selectedDate");
-
-    // Generate all possible slots
+    // Generate all time slots between start and end time
     final allSlots = generateSlots(
       _formatTimeOfDay(prof.availableTimeStart),
       _formatTimeOfDay(prof.availableTimeEnd),
       durationMinutes,
     );
-    // print("Generated slots: $allSlots");
 
-    // Get booked slots from Firestore
     try {
+      // 🔹 Get booked slots from DB
       final booked = await fetchBookedSlots(prof.id, selected ?? _selectedDate);
       print("Booked slots: $booked");
 
-      // Remove booked slots
-      final available = allSlots.where((s) => !booked.contains(s)).toList();
-
       setState(() {
         _bookedSlots = booked;
-        _availableSlots = available;
-        if (_selectedTimeSlot != null &&
-            !available.contains(_selectedTimeSlot)) {
+        _availableSlots = allSlots; // 👈 show all, booked will be greyed out
+
+        // If previously selected slot is now booked, deselect it
+        if (_selectedTimeSlot != null && booked.contains(_selectedTimeSlot)) {
           _selectedTimeSlot = null;
         }
       });

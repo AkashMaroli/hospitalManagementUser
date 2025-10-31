@@ -5,9 +5,9 @@
     <!-- For Android 12 and below -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <application
-        android:label="hospitalmanagementuser"
+        android:label="MedValley"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <!-- ✅ Razorpay Checkout Activity -->
         <activity
             android:name="com.razorpay.CheckoutActivity"/>  

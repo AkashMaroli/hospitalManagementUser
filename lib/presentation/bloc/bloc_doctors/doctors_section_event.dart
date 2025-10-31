@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 
 abstract class DoctorEvent extends Equatable {
@@ -6,15 +5,29 @@ abstract class DoctorEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Event to fetch all doctors
 class FetchDoctorsEvent extends DoctorEvent {}
 
-
-// Event to search doctors by name/department
 class SearchDoctorsEvent extends DoctorEvent {
   final String query;
   SearchDoctorsEvent(this.query);
 
   @override
   List<Object?> get props => [query];
+}
+
+class FilterDoctorsEvent extends DoctorEvent {
+  final double? minPrice;
+  final double? maxPrice;
+  final int? minExperience;
+  final String? gender;
+
+  FilterDoctorsEvent({
+    this.minPrice,
+    this.maxPrice,
+    this.minExperience,
+    this.gender,
+  });
+
+  @override
+  List<Object?> get props => [minPrice, maxPrice, minExperience, gender];
 }

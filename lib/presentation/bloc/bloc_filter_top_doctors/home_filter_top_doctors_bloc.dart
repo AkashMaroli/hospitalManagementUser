@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hospitalmanagementuser/data/models/doctors_model.dart';
@@ -5,9 +7,10 @@ import 'package:hospitalmanagementuser/data/services/doctors_service.dart';
 part 'home_filter_top_doctors_event.dart';
 part 'home_filter_top_doctors_state.dart';
 
-class HomeFilterTopDoctorsBloc extends Bloc<HomeFilterTopDoctorsEvent, HomeFilterTopDoctorsState> {
+class HomeFilterTopDoctorsBloc
+    extends Bloc<HomeFilterTopDoctorsEvent, HomeFilterTopDoctorsState> {
   HomeFilterTopDoctorsBloc() : super(HomeFilterTopDoctorsInitial()) {
-    on<HomeFilterTopDoctorsEvent>( _onFilterTopDoctors);
+    on<HomeFilterTopDoctorsEvent>(_onFilterTopDoctors);
   }
 
   void _onFilterTopDoctors(
@@ -18,10 +21,9 @@ class HomeFilterTopDoctorsBloc extends Bloc<HomeFilterTopDoctorsEvent, HomeFilte
 
     try {
       final doctorStream = filterExperienceDoctors();
-      await emit.forEach( 
+      await emit.forEach(
         doctorStream,
         onData: (List<DoctorsProfileModel> doctors) {
-          print('Success');
           return HomeFilterTopDoctorsLoadedState(doctors);
         },
         onError: (error, stackTrace) {
@@ -29,8 +31,8 @@ class HomeFilterTopDoctorsBloc extends Bloc<HomeFilterTopDoctorsEvent, HomeFilte
         },
       );
     } catch (e) {
+      log(e.toString());
       emit(HomeFilterTopDoctorsErrorState(e.toString()));
     }
   }
-
 }

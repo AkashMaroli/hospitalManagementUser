@@ -2,76 +2,78 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hospitalmanagementuser/data/models/chat_model.dart';
 
 class ChatServices {
- // get a instence of firebase
- 
-
-
-
- //chat stream
-
-
-
-
- // send a message 
-   
- Future<void> sendMessage({
-  required ChatMessageModel chatModel
-  // required String senderId,
-  // required String receiverId,
-  // required String text,
+  //!--------Send--A--Chat--Message-----------
+  Future<void> sendMessage({
+    required ChatMessageModel chatModel,
+    required String receiverName,
+    // required String receiverPhoto,
   }) async {
-  final firestore = FirebaseFirestore.instance;
-  final batch = firestore.batch();
+    final firestore = FirebaseFirestore.instance;
+    final batch = firestore.batch();
 
-  final msgRef = firestore.collection('chatRooms').doc(chatModel.chatId).collection('messages').doc();
-  batch.set(msgRef, {
-    'senderId': chatModel.senderId,
-    'receiverId': chatModel.receiverId,
-    'text': chatModel.message,
-    'timestamp': FieldValue.serverTimestamp(),
-    'seen': false,
-  });
+    // ✅ 1. Generate a unique & consistent chatId
+    final sortedIds = [chatModel.senderId, chatModel.receiverId]..sort();
+    final chatId = '${sortedIds[0]}_${sortedIds[1]}';
 
-  final roomRef = firestore.collection('chatRooms').doc(chatModel. chatId);
-  batch.set(roomRef, {
-    'chatId':chatModel. chatId,
-    'participants': [chatModel. senderId,chatModel. receiverId],
-    'lastMessage':chatModel.message,
-    'lastMessageTime': FieldValue.serverTimestamp(),
-  }, SetOptions(merge: true));
+    // ✅ 2. Create message document
+    final msgRef =
+        firestore
+            .collection('chatRooms')
+            .doc(chatId)
+            .collection('messages')
+            .doc();
 
-  await batch.commit();
- }
- 
-    //get a message
+    batch.set(msgRef, {
+      'senderId': chatModel.senderId,
+      'receiverId': chatModel.receiverId,
+      'text': chatModel.message,
+      'timestamp': FieldValue.serverTimestamp(),
+      'seen': false,
+    });
+
+    // ✅ 3. Create / update chat room document
+    final roomRef = firestore.collection('chatRooms').doc(chatId);
+    batch.set(roomRef, {
+      'chatId': chatId,
+      'participants': [chatModel.senderId, chatModel.receiverId],
+      'lastMessage': chatModel.message,
+      'lastMessageTime': FieldValue.serverTimestamp(),
+      'receiverId': chatModel.receiverId,
+      'receiverName': receiverName,
+      // 'receiverPhoto': receiverPhoto,
+    }, SetOptions(merge: true));
+
+    // ✅ 4. Commit both writes atomically
+    await batch.commit();
+  }
+
+  //!-------Get--Messages-------
   Stream<QuerySnapshot> messagesStream(String chatId) {
-  return FirebaseFirestore.instance
-    .collection('chatRooms').doc(chatId)
-    .collection('messages')
-    .orderBy('timestamp', descending: true)
-    .snapshots();
+    return FirebaseFirestore.instance
+        .collection('chatRooms')
+        .doc(chatId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 
-
-  // get chat list of matching with current patient and with last message,time,
+  //!-------ChatList--Of--Already--Messaged--Individuals-------------
   Stream<List<Map<String, dynamic>>> getChatRoomsFor(String uid) {
-  return FirebaseFirestore.instance
-    .collection('chatRooms')
-    .where('participants', arrayContains: uid)
-    .orderBy('lastMessageTime', descending: true)
-    .snapshots()
-    .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+    return FirebaseFirestore.instance
+        .collection('chatRooms')
+        .where('participants', arrayContains: uid)
+        .orderBy('lastMessageTime', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  // get patient side chat list
-  // Stream<List<Map<String, dynamic>>> getPatientChats(String patientId) {
-  // return FirebaseFirestore.instance
-  //     .collection("chatRooms")
-  //     .where("participants", arrayContains: patientId)
-  //     .orderBy("lastMessageTime", descending: true)
-  //     .snapshots()
-  //     .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
-  //  }
-
- 
+  //!-------Individual--Chat--List--Or--Individual--Previous--Chat--List--------
+  Stream<List<QueryDocumentSnapshot>> getChatList(String currentUserId) {
+    return FirebaseFirestore.instance
+        .collection("chats")
+        .where("participants", arrayContains: currentUserId)
+        .orderBy("lastMessageTime", descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs);
+  }
 }

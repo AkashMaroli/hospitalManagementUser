@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hospitalmanagementuser/core/constants.dart';
+import 'package:hospitalmanagementuser/data/models/appointment_model.dart';
+import 'package:hospitalmanagementuser/presentation/bloc/bloc_my_appointments/my_appointment_bloc.dart';
+import 'package:hospitalmanagementuser/presentation/bloc/bloc_my_appointments/my_appointment_event.dart';
+import 'package:hospitalmanagementuser/presentation/bloc/bloc_my_appointments/my_appointment_state.dart';
+import 'package:hospitalmanagementuser/presentation/pages/appointments/widget/appointment_cards.dart';
+
 
 class AppoinmentScreen extends StatelessWidget {
   const AppoinmentScreen({super.key});
@@ -16,12 +23,22 @@ class AppoinmentScreen extends StatelessWidget {
               Tab(text: "Upcoming"),
               Tab(text: "Completed"),
             ],
+            indicatorColor: themeColor,
+            labelColor: themeColor,
+            labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            dividerColor: Colors.white,
           ),
         ),
         body: TabBarView(
           children: [
-            AppointmentList(isUpcoming: true),
-            AppointmentList(isUpcoming: false),
+            BlocProvider(
+              create: (_) => AppointmentBloc()..add(LoadUpcomingAppointments()),
+              child: const AppointmentTab(),
+            ),
+            BlocProvider(
+              create: (_) => AppointmentBloc()..add(LoadCompletedAppointments()),
+              child: const AppointmentTab(),
+            ),
           ],
         ),
       ),
@@ -29,91 +46,52 @@ class AppoinmentScreen extends StatelessWidget {
   }
 }
 
-class AppointmentList extends StatelessWidget {
-  final bool isUpcoming;
-  const AppointmentList({super.key, required this.isUpcoming});
+class AppointmentTab extends StatelessWidget {
+  const AppointmentTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> appointments = List.generate(7, (index) {
-      return {
-        "doctor": "Dr. Alis Johnson",
-        "department": "General",
-        "date": DateTime.now().add(Duration(days: index)),
-        "isUpcoming": index % 2 == 0, // Mock: Even-indexed are upcoming, odd are completed
-      };
-    });
+    return BlocBuilder<AppointmentBloc, AppointmentState>(
+      builder: (context, state) {
+        if (state is AppointmentLoading) {
+          return Center(child: CircularProgressIndicator(color: themeColor));
+        } else if (state is AppointmentLoaded) {
+          final appointments = state.appointments;
+          if (appointments.isEmpty) {
+            return Center(child: Text("No Appointments Found"));
+          }
+          return AppointmentList(filteredAppointments: appointments);
+        } else if (state is AppointmentError) {
+          return Center(child: Text('Error: ${state.message}'));
+        }
+        return Center(child: Text('No Data'));
+      },
+    );
+  }
+}
 
-    // Filter upcoming/completed appointments
-    List<Map<String, dynamic>> filteredAppointments =
-        appointments.where((appt) => appt["isUpcoming"] == isUpcoming).toList();
+class AppointmentList extends StatelessWidget {
+  final List<AppointmentModel> filteredAppointments;
+  final TextEditingController textcontroller = TextEditingController();
 
+  AppointmentList({super.key, required this.filteredAppointments});
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: filteredAppointments.length,
       itemBuilder: (context, index) {
-        var appointment = filteredAppointments[index];
+        final appointment = filteredAppointments[index];
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: 180,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 31, 199, 191),
-                  Color.fromARGB(255, 53, 158, 158),
-                ],
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 20),
-                ListTile(
-                  leading: Container(
-                    height: 100,
-                    width: 70,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image.asset(
-                        'assets/images/OIP (1).jpeg',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  title: Text(appointment["doctor"]),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(appointment["department"]), // Department Name
-                      SizedBox(height: 6),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isUpcoming ? const Color.fromARGB(235, 7, 7, 7) : Colors.green,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          " ${DateFormat('MMM dd, yyyy | hh:mm a').format(appointment["date"])}",
-                          style: TextStyle(fontSize: 12, color: Colors.white),
-                        ),
-                      ), // Appointment Date & Time
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text('Message', style: TextStyle(fontSize: 19)),
-                    Text('Calling', style: TextStyle(fontSize: 19)),
-                  ],
-                ),
-              ],
+          child: Card(
+            color: Theme.of(context).canvasColor,
+            elevation: 2,
+            child: appointmentCard(
+              appointment,
+              context,
+              appointment.appointmentStatus,
+              textcontroller,
             ),
           ),
         );

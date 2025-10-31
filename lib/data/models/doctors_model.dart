@@ -118,6 +118,39 @@ class DoctorsProfileModel {
     );
   }
 
+
+  DoctorsProfileModel copyWith({
+  List<ReviewModel>? reviewAndRatings,
+}) {
+  return DoctorsProfileModel(
+    id: id,
+    fullName: fullName,
+    department: department,
+    qualification: qualification,
+    availableTimeStart: availableTimeStart,
+    availableTimeEnd: availableTimeEnd,
+    phoneNumber: phoneNumber,
+    photoUrl: photoUrl,
+    adminApproved: adminApproved,
+    emailAddress: emailAddress,
+    gender: gender,
+    yearsOfExperience: yearsOfExperience,
+    videoConsultation: videoConsultation,
+    expectedConsultationFee: expectedConsultationFee,
+    reviewAndRatings: reviewAndRatings ?? this.reviewAndRatings,
+    activeStatus: activeStatus,
+    availableDays: availableDays,
+    specialization: specialization,
+    idProof: idProof,
+    medicalLicence: medicalLicence,
+    timeDurationNeeded: timeDurationNeeded,
+    rejectNote: rejectNote,
+    possibleJointDate: possibleJointDate,
+    personBlocked: personBlocked,
+  );
+}
+
+
   // Utility: TimeOfDay <-> String
   static String _formatTimeOfDay(TimeOfDay time) =>
       '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';

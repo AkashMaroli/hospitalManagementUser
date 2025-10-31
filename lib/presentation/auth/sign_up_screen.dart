@@ -1,6 +1,9 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hospitalmanagementuser/data/services/auth_services.dart';
+import 'package:hospitalmanagementuser/presentation/auth/sign_in_screen.dart';
+import 'package:hospitalmanagementuser/presentation/pages/profile/privacy_policy.dart';
+import 'package:hospitalmanagementuser/presentation/pages/profile/terms_and_conditions.dart';
 import 'package:hospitalmanagementuser/presentation/widgets/bottom_nav_bar.dart';
 import 'package:hospitalmanagementuser/presentation/widgets/login_widgets.dart';
 
@@ -46,32 +49,136 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   children: [
                     const Text(
                       'Welcome Back',
-                      style: TextStyle(fontSize: 35, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 35,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const Text(
                       'Please sign up to continue',
-                      style: TextStyle(fontSize: 16, color: Color(0xFFE0E0E0), fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFFE0E0E0),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 5),
                     buildLabel('Email'),
-                    normalTextField('Email', Icons.email_outlined, emailController, _validateEmail),
+                    normalTextField(
+                      'your email',
+                      Icons.email_outlined,
+                      emailController,
+                      _validateEmail,
+                    ),
                     buildLabel('Password'),
-                    passwordTextField('Enter', false, passwordController, _validatePassword),
+                    passwordTextField(
+                      'Enter',
+                      
+                      passwordController,
+                      _validatePassword,
+                    ),
                     buildLabel('Confirm Password'),
-                    passwordTextField('Confirm', true, confirmPasswordController, _validateConfirmPassword),
-                    const SizedBox(height: 10),
+                    passwordTextField(
+                      'Confirm',
+                      
+                      confirmPasswordController,
+                      _validateConfirmPassword,
+                    ),
+                    const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: _signUp,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
                       ),
                       child: const Text(
                         'Sign Up',
-                        style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
+                    SizedBox(height: 20),
+
+                    Text('By registering you agree to'),
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 5,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => TermsAndConditionsPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Terms & Conditions',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text('and', style: TextStyle(color: Colors.black)),
+                        GestureDetector(
+                           onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PrivacyPolicyPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Privacy Policy',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 5,
+                      children: [
+                        Text(
+                          'Already have an account?',
+                          style: TextStyle(
+                            color: Colors.black,
+                            // fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => SignInScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -97,7 +204,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       alignment: Alignment.centerLeft,
       child: Text(
         label,
-        style: const TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500),
+        style: const TextStyle(
+          fontSize: 18,
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -109,12 +220,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => isLoading = true);
     log('Trying to register: ${emailController.text}');
 
-    final user = await register(emailController.text.trim(), passwordController.text.trim());
+    final user = await register(
+      emailController.text.trim(),
+      passwordController.text.trim(),
+      context,
+    );
     setState(() => isLoading = false);
 
     if (user != null) {
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BottomNavBar()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => BottomNavBar()),
+      );
     } else {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
